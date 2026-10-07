@@ -1,0 +1,14 @@
+# Gerado pelos laboratórios, não deve ir para o repositório.
+.env
+pki/ca/*.crt
+pki/ca/*.key
+pki/ca/*.srl
+pki/ldap/*.crt
+pki/ldap/*.key
+pki/ldap/*.csr
+pki/confianca/*.crt
+grafana/ldap-sem-tls.toml
+out/
+__pycache__/
+*.pyc
+.DS_Store
