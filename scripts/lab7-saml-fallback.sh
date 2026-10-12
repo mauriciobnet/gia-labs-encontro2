@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Lab 7, caminho alternativo (fallback multi-arch): o "parceiro" SAML implementado no PRÓPRIO Keycloak.
+# Lab 7, caminho padrão (multi-arch): o "parceiro" SAML implementado no PRÓPRIO Keycloak.
+# Nasceu como alternativa ao SimpleSAMLphp e virou o caminho padrão dos alunos; o nome do
+# arquivo ficou. O SimpleSAMLphp (lab7-saml.sh) é o caminho opcional.
 #
 # Por quê: a imagem kristophjunge/test-saml-idp:1.15 é de 2018 e só existe para linux/amd64
 # (manifest único, sem lista de plataformas). Em Mac com Apple Silicon ela só roda sob emulação
@@ -267,9 +269,9 @@ echo "Login pelo navegador: $GRAFANA/login -> 'Sign in with Keycloak ACME'"
 echo "                      -> botão 'Parceiro (SAML via Keycloak)' -> parceiro.user / Senha@123"
 echo "                      -> botão 'Universidade (OIDC)'          -> maria.prof / Senha@123"
 if [ "$FAILS" -eq 0 ]; then
-  carimbar 7 "Lab 7: federação SAML (caminho alternativo, IdP no Keycloak)" "realm parceiro como IdP SAML e realm universidade como IdP OIDC" ok
-  echo "LAB7 OK (pelo caminho alternativo)"
+  carimbar 7 "Lab 7: federação SAML (caminho padrão, IdP no Keycloak)" "realm parceiro como IdP SAML e realm universidade como IdP OIDC" ok
+  echo "LAB7 OK (caminho padrão)"
 else
-  carimbar 7 "Lab 7: federação SAML (caminho alternativo, IdP no Keycloak)" "$FAILS verificação(ões) falharam" falha
-  echo "LAB7 (alternativo) FALHOU ($FAILS)"; exit 1
+  carimbar 7 "Lab 7: federação SAML (caminho padrão, IdP no Keycloak)" "$FAILS verificação(ões) falharam" falha
+  echo "LAB7 (caminho padrão) FALHOU ($FAILS)"; exit 1
 fi

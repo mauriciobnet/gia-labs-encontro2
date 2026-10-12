@@ -2,8 +2,8 @@
   "lab": "lab5",
   "titulo": "Lab 5 · Keycloak como IdP: federação LDAP, força bruta e MFA",
   "subtitulo": "Realm ACME, user federation, política de senha, brute-force detection, TOTP e o Grafana com duas portas",
-  "gerado": "2026-10-07T09:17:20.043Z",
-  "duracao_s": 90,
+  "gerado": "2026-10-10T12:11:23.186Z",
+  "duracao_s": 111,
   "passos": [
     {
       "n": 1,
@@ -13,7 +13,7 @@
       "esperado": "Tela de login do Keycloak (realm master).",
       "status": "ok",
       "png": "img/01.png",
-      "url": "http://keycloak.localhost:18080/realms/master/protocol/openid-connect/auth?client_id=security-admin-console&redirect_uri=http%3A%2F%2Fkeycloak.localhost%3A18080%2Fadmin%2Fmaster%2Fconsole%2F&state=d9bf6e44-bab8-4e41-9bc9-d6500b7b6857&response_mode=query&response_type=code&scope=openid&nonce=1c6e5da2-6321-4edc-b5ec-675db5e5aa85&code_challenge=QBjhBHclaZ9VYuT3rwHsvDPzsHZTx8jErC-IeIaJyTw&code_challenge_method=S256",
+      "url": "http://keycloak.localhost:18080/realms/master/protocol/openid-connect/auth?client_id=security-admin-console&redirect_uri=http%3A%2F%2Fkeycloak.localhost%3A18080%2Fadmin%2Fmaster%2Fconsole%2F&state=40c363ed-d72f-46fa-92fd-183be6720226&response_mode=query&response_type=code&scope=openid&nonce=e6954cb4-0f90-4c65-9edd-d1d4341e708e&code_challenge=gnmCix8BKbfnLEca_CG1KvYMIr48mZIWHHdVDDxhBbk&code_challenge_method=S256",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -52,7 +52,7 @@
       "esperado": "Formulário do provedor acme-ldap com Connection URL, Enable StartTLS em On, bind DN, Users DN e Edit mode READ_ONLY.",
       "status": "ok",
       "png": "img/04.png",
-      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/user-federation/ldap/xTfgXYdcRFmyWkR-7hy-4Q",
+      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/user-federation/ldap/V_1JJP0uRcip9eokMS2EEA",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -78,7 +78,7 @@
       "esperado": "Grupo ti listado.",
       "status": "ok",
       "png": "img/06.png",
-      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/4e37a1fb-651e-4891-b61d-52467f0522db/groups",
+      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/3fab366b-4118-41b3-b20d-39f773e54d14/groups",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -113,12 +113,12 @@
       "n": 9,
       "tipo": "term",
       "titulo": "Simular força bruta contra bruno.lima",
-      "texto": "Do toolbox, faça 3 logins com senha errada e depois 1 com a senha certa. Repare no grant_type=password: é o password grant, em que a senha passa pelo client (aqui, o toolbox-cli) e o Keycloak a confere. É um atalho que só existe no laboratório, mas mostra a defesa: quem decide é o Keycloak, e depois do bloqueio a senha CERTA também é recusada.",
+      "texto": "Do toolbox, faça 3 logins com senha errada, com 2 segundos entre eles, e depois 1 com a senha certa. Repare no grant_type=password: é o password grant, em que a senha passa pelo client (aqui, o toolbox-cli) e o Keycloak a confere. É um atalho que só existe no laboratório, mas mostra a defesa: quem decide é o Keycloak, e depois do bloqueio a senha CERTA também é recusada. E por que o sleep 2? Sem a pausa, as tentativas saem a menos de 1 segundo uma da outra, e o Keycloak bloqueia já na segunda falha por outra defesa, a detecção de automação (\"Quick login check milliseconds\", na mesma tela do passo 7). Com a pausa, quem bloqueia é o limite de 3 falhas.",
       "esperado": "Três \"invalid_grant\" e, na quarta, \"Invalid user credentials\" mesmo com a senha certa (conta (account) temporariamente bloqueada).",
       "status": "ok",
       "png": "img/09.png",
       "url": null,
-      "cmd": "for i in 1 2 3; do curl -s -X POST http://keycloak.localhost:18080/realms/acme/protocol/openid-connect/token -d grant_type=password -d client_id=toolbox-cli -d username=bruno.lima -d password=errada$i | jq -c .; done; echo \"--- agora com a senha correta:\"; curl -s -X POST http://keycloak.localhost:18080/realms/acme/protocol/openid-connect/token -d grant_type=password -d client_id=toolbox-cli -d username=bruno.lima -d 'password=Senha@123' | jq -c .",
+      "cmd": "for i in 1 2 3; do curl -s -X POST http://keycloak.localhost:18080/realms/acme/protocol/openid-connect/token -d grant_type=password -d client_id=toolbox-cli -d username=bruno.lima -d password=errada$i | jq -c .; sleep 2; done; echo \"--- agora com a senha correta:\"; curl -s -X POST http://keycloak.localhost:18080/realms/acme/protocol/openid-connect/token -d grant_type=password -d client_id=toolbox-cli -d username=bruno.lima -d 'password=Senha@123' | jq -c .",
       "saida": "{\"error\":\"invalid_grant\",\"error_description\":\"Invalid user credentials\"}\n{\"error\":\"invalid_grant\",\"error_description\":\"Invalid user credentials\"}\n{\"error\":\"invalid_grant\",\"error_description\":\"Invalid user credentials\"}\n--- agora com a senha correta:\n{\"error\":\"invalid_grant\",\"error_description\":\"Invalid user credentials\"}",
       "obs": "",
       "onde": "toolbox"
@@ -131,7 +131,7 @@
       "esperado": "Campo \"Temporarily locked\" com o botão em On, na página de bruno.lima.",
       "status": "ok",
       "png": "img/10.png",
-      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/75923a2a-5dad-44b8-ad35-d2ecae363925/settings",
+      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/bd726bd2-1796-4ac5-a1e0-d6a5512ebb0c/settings",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -140,13 +140,13 @@
       "n": 11,
       "tipo": "term",
       "titulo": "Ver a detecção pela API e desbloquear",
-      "texto": "O estado de força bruta é consultável (útil para SOC/automação). Depois, limpe o bloqueio para continuar os labs.",
-      "esperado": "JSON com numFailures=3, disabled=true; depois \"desbloqueado\".",
+      "texto": "O estado de força bruta é consultável (útil para SOC/automação): numFailures conta as falhas que o Keycloak registrou, e disabled diz que o usuário está bloqueado agora. Depois, limpe o bloqueio para continuar os labs.",
+      "esperado": "JSON com numFailures=3 e disabled=true; depois \"desbloqueado\".",
       "status": "ok",
       "png": "img/11.png",
       "url": null,
       "cmd": "source /work/scripts/lib.sh >/dev/null; ID=$(kc_get \"/users?username=bruno.lima&exact=true\" | jq -r '.[0].id'); kc_get \"/attack-detection/brute-force/users/$ID\" | jq .; curl -s -X DELETE \"http://keycloak.localhost:18080/admin/realms/acme/attack-detection/brute-force/users/$ID\" \"${auth[@]}\" && echo desbloqueado",
-      "saida": "{\n  \"failedLoginNotBefore\": 1791364641,\n  \"numFailures\": 2,\n  \"numTemporaryLockouts\": 0,\n  \"disabled\": true,\n  \"lastIPFailure\": \"10.10.4.3\",\n  \"lastFailure\": 1791364581914\n}\ndesbloqueado",
+      "saida": "{\n  \"failedLoginNotBefore\": 1791634271,\n  \"numFailures\": 3,\n  \"numTemporaryLockouts\": 1,\n  \"disabled\": true,\n  \"lastIPFailure\": \"10.10.22.2\",\n  \"lastFailure\": 1791634211273\n}\ndesbloqueado",
       "obs": "",
       "onde": "toolbox"
     },
@@ -158,7 +158,7 @@
       "esperado": "Campo \"Required user actions\" com \"Configure OTP\" selecionado, na página de ana.souza.",
       "status": "ok",
       "png": "img/12.png",
-      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/4e37a1fb-651e-4891-b61d-52467f0522db/settings",
+      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/3fab366b-4118-41b3-b20d-39f773e54d14/settings",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -184,7 +184,7 @@
       "esperado": "A chave base32 em texto, os parâmetros do TOTP (Time-based, SHA1, 6 dígitos, intervalo 30 s) e o campo \"One-time code\".",
       "status": "ok",
       "png": "img/14.png",
-      "url": "http://keycloak.localhost:18080/realms/acme/login-actions/required-action?client_id=grafana&tab_id=muRw0_rfedg&client_data=eyJydSI6Imh0dHA6Ly9ncmFmYW5hLmxvY2FsaG9zdDoxODA4MC9sb2dpbi9nZW5lcmljX29hdXRoIiwicnQiOiJjb2RlIiwic3QiOiJROHAwR19NSmxTY1N1ZWU2TnlLYTlRaG00eVpIcUdSRGlscEpXM004MXhnPSJ9&mode=manual&execution=CONFIGURE_TOTP",
+      "url": "http://keycloak.localhost:18080/realms/acme/login-actions/required-action?client_id=grafana&tab_id=S7dijH1Ydak&client_data=eyJydSI6Imh0dHA6Ly9ncmFmYW5hLmxvY2FsaG9zdDoxODA4MC9sb2dpbi9nZW5lcmljX29hdXRoIiwicnQiOiJjb2RlIiwic3QiOiJlSjZyTy1LY2lES3FQNHl6TkJOeVI0NnNMTTVaQ0pod3NNRXV4ZmNBZDlFPSJ9&mode=manual&execution=CONFIGURE_TOTP",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -210,7 +210,7 @@
       "esperado": "Tela \"One-time code\" do Keycloak, depois da senha.",
       "status": "ok",
       "png": "img/16.png",
-      "url": "http://keycloak.localhost:18080/realms/acme/login-actions/authenticate?execution=0a0fb715-30ae-4989-a8f6-8a5f051ade8f&client_id=grafana&tab_id=kK2DhMYwHT4&client_data=eyJydSI6Imh0dHA6Ly9ncmFmYW5hLmxvY2FsaG9zdDoxODA4MC9sb2dpbi9nZW5lcmljX29hdXRoIiwicnQiOiJjb2RlIiwic3QiOiI4a1psbjhydXVQc2ZOSlpFUzYzcGhjNS1aVTR3TmQxMW9nUWVmQlNrRE5vPSJ9",
+      "url": "http://keycloak.localhost:18080/realms/acme/login-actions/authenticate?execution=592f3e33-6188-4dc5-8743-4a0183ec7676&client_id=grafana&tab_id=b2A-VMn6IJ0&client_data=eyJydSI6Imh0dHA6Ly9ncmFmYW5hLmxvY2FsaG9zdDoxODA4MC9sb2dpbi9nZW5lcmljX29hdXRoIiwicnQiOiJjb2RlIiwic3QiOiJYd1k0bE1ZNFFkYVZZUzNVMUdYN09KQW5RYlRSdDY2ajF6bHp1NndBMDdvPSJ9",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -236,7 +236,7 @@
       "esperado": "Linha Otp com o rótulo \"Celular da Ana\" e, abaixo, password provided by acme-ldap.",
       "status": "ok",
       "png": "img/18.png",
-      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/4e37a1fb-651e-4891-b61d-52467f0522db/credentials",
+      "url": "http://keycloak.localhost:18080/admin/master/console/#/acme/users/3fab366b-4118-41b3-b20d-39f773e54d14/credentials",
       "cmd": null,
       "saida": null,
       "obs": ""
@@ -264,7 +264,7 @@
       "png": "img/20.png",
       "url": null,
       "cmd": "python3 /work/scripts/evidencia.py mostrar --lab 5",
-      "saida": "{\n  \"formato\": \"gia-evidencia/2\",\n  \"lab\": \"5\",\n  \"titulo\": \"Lab 5: federação do diretório no Keycloak\",\n  \"aluno\": {\n    \"nome\": \"Validacao Automatica\",\n    \"email\": \"validacao@example.com\",\n    \"instalacao\": \"5476936d4536\"\n  },\n  \"maquina\": {\n    \"host\": \"7eccad1d8bdd\",\n    \"porta\": 18080\n  },\n  \"quando\": \"2026-10-07T06:15:49-0300\",\n  \"ok\": true,\n  \"resumo\": \"7 de 7 verificações passaram\",\n  \"verificacoes\": [\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"realm federado\",\n      \"observado\": \"acme\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"conexão com o diretório\",\n      \"observado\": \"ldap://openldap:389 com StartTLS, certificado conferido pela CA da ACME\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"issuer do realm\",\n      \"observado\": \"http://keycloak.localhost:18080/realms/acme\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"usuários vindos do diretório\",\n      \"observado\": \"ana.souza, bruno.lima, carla.dias\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"identidade no id_token\",\n      \"observado\": \"user=ana.souza email=ana.souza@acme.edu.br sub=4e37a1fb-651e-4891-b61d-52467f0522db\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"grupos de ana.souza no Keycloak\",\n      \"observado\": \"ti\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"aplicação registrada no realm\",\n      \"observado\": \"grafana confidencial=true redirect=http://grafana.localhost:18080/login/generic_oauth\"\n    }\n  ],\n  \"conferencia\": \"sha256:5ea48b711bdbfd59362c6e5da4b9762434f459990b6e11470248402eb5ea9ad5\"\n}",
+      "saida": "{\n  \"formato\": \"gia-evidencia/2\",\n  \"lab\": \"5\",\n  \"titulo\": \"Lab 5: federação do diretório no Keycloak\",\n  \"aluno\": {\n    \"nome\": \"Validacao Automatica\",\n    \"email\": \"validacao@example.com\",\n    \"instalacao\": \"3753a900e00d\"\n  },\n  \"maquina\": {\n    \"host\": \"ed5d1b713c07\",\n    \"porta\": 18080\n  },\n  \"quando\": \"2026-10-10T09:09:31-0300\",\n  \"ok\": true,\n  \"resumo\": \"7 de 7 verificações passaram\",\n  \"verificacoes\": [\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"realm federado\",\n      \"observado\": \"acme\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"conexão com o diretório\",\n      \"observado\": \"ldap://openldap:389 com StartTLS, certificado conferido pela CA da ACME\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"issuer do realm\",\n      \"observado\": \"http://keycloak.localhost:18080/realms/acme\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"usuários vindos do diretório\",\n      \"observado\": \"ana.souza, bruno.lima, carla.dias\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"identidade no id_token\",\n      \"observado\": \"user=ana.souza email=ana.souza@acme.edu.br sub=3fab366b-4118-41b3-b20d-39f773e54d14\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"grupos de ana.souza no Keycloak\",\n      \"observado\": \"ti\"\n    },\n    {\n      \"estado\": \"ok\",\n      \"o_que\": \"aplicação registrada no realm\",\n      \"observado\": \"grafana confidencial=true redirect=http://grafana.localhost:18080/login/generic_oauth\"\n    }\n  ],\n  \"conferencia\": \"sha256:b31f4b54cead2a4fc8643023fcd44709335599c9555515a386618cd4e734d4db\"\n}",
       "obs": "",
       "onde": "toolbox"
     }
