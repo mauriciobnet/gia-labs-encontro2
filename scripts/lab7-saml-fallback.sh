@@ -113,7 +113,8 @@ IDP_JSON=$(echo "$IMPORTED" | jq --arg ent "$SP_ENTITY" --arg alias "$ALIAS" '{
                # devolve NameID="G-<uuid>" e o usuário nasceria em acme como "g-<uuid>" em vez
                # de "parceiro.user". Pedimos "unspecified" e, no client, forçamos o formato
                # username (saml_force_name_id_format=true) : cinto e suspensório.
-               nameIDPolicyFormat:"urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified",
+               # O "unspecified" da norma mora no namespace do SAML 1.1 (não há um 2.0).
+               nameIDPolicyFormat:"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
                postBindingResponse:"true",
                postBindingAuthnRequest:"true", wantAuthnRequestsSigned:"false",
                validateSignature:"true", syncMode:"IMPORT", backchannelSupported:"false"})}')
