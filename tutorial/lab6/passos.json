@@ -9,7 +9,7 @@
       "n": 1,
       "tipo": "ui",
       "titulo": "Entrar no Grafana pelo Keycloak, olhando a URL",
-      "texto": "Abra http://grafana.localhost:18080 e clique em \"Sign in with Keycloak ACME\", como no Lab 5. Antes de digitar a senha, olhe a barra de endereços: o Grafana mandou o navegador para /realms/acme/protocol/openid-connect/auth com client_id=grafana, redirect_uri, scope=openid e code_challenge (PKCE). É o pedido de autorização do OIDC.",
+      "texto": "Se o Grafana ainda estiver aberto com a sessão do passo 17 do Lab 5, saia antes (menu do avatar, Sign out). Depois, abra http://grafana.localhost:18080 e clique em \"Sign in with Keycloak ACME\", como no Lab 5. Antes de digitar a senha, olhe a barra de endereços: o Grafana mandou o navegador para /realms/acme/protocol/openid-connect/auth com client_id=grafana, redirect_uri, scope=openid profile email (o openid é que faz do pedido um login OIDC) e code_challenge (PKCE). É o pedido de autorização do OIDC.",
       "esperado": "Tela de login do Keycloak (realm ACME): a URL contém response_type=code e code_challenge_method=S256.",
       "status": "ok",
       "png": "img/01.png",

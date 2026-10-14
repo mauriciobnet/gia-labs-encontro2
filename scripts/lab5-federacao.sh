@@ -212,7 +212,7 @@ if [ -n "$ID_ANA" ] && curl -fsS "${auth[@]}" "$KC/admin/realms/$REALM/users/$ID
 fi
 
 echo "== login OIDC de usuário do LDAP ($TESTE) =="
-# scope=openid é necessário para receber o id_token: no Keycloak >= 25 o client
+# scope=openid é necessário para receber o id_token: no Keycloak >= 26 o client
 # admin-cli emite "lightweight access token" (sem preferred_username/email/sub),
 # então as claims de identidade só aparecem no id_token.
 RESP=$(curl -fsS -X POST "$KC/realms/$REALM/protocol/openid-connect/token" \

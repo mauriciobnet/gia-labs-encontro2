@@ -184,7 +184,7 @@ follow() { # ver lab4-federacao.sh: curl não guarda cookie "Secure" vindo por h
 say "teste: botão '$ALIAS' na tela de login do realm $REALM"
 CV=$(head -c 48 /dev/urandom | base64 | tr '+/' '-_' | tr -d '=')
 CC=$(printf '%s' "$CV" | openssl dgst -binary -sha256 | base64 | tr '+/' '-_' | tr -d '=')
-AUTH_URL="$KC/realms/$REALM/protocol/openid-connect/auth?client_id=grafana&redirect_uri=http%3A%2F%2Fgrafana.localhost:18080%2Flogin%2Fgeneric_oauth&response_type=code&scope=openid&state=teste&code_challenge=$CC&code_challenge_method=S256"
+AUTH_URL="$KC/realms/$REALM/protocol/openid-connect/auth?client_id=grafana&redirect_uri=http%3A%2F%2Fgrafana.localhost%3A$PORTA%2Flogin%2Fgeneric_oauth&response_type=code&scope=openid&state=teste&code_challenge=$CC&code_challenge_method=S256"
 ck_reset; follow "$AUTH_URL" "$OUT/login-4b.html" >/dev/null
 grep -q "social-$ALIAS" "$OUT/login-4b.html" && ok "botão 'Parceiro (SAML via Keycloak)' presente" || ko "botão do IdP $ALIAS não aparece no login"
 

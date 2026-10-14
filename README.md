@@ -70,6 +70,15 @@ O restart é necessário porque o Keycloak e o Grafana só leem certificados e a
 diretório quando sobem. A preparação grava um arquivo de evidência que serve só ao painel: ele não
 vai para o Moodle.
 
+Ainda antes da aula, baixe as imagens do Lab 6, para não depender da rede da sala:
+
+```bash
+docker compose --profile lab6 pull --ignore-buildable
+```
+
+O `--ignore-buildable` pula as imagens que o Compose constrói na sua máquina, como a do `toolbox`:
+elas não existem em registro nenhum, e o `pull` não deve procurá-las lá.
+
 Depois abra o **painel** em <http://localhost:18080>. Quando os serviços ficarem verdes, a etapa
 "Preparação" aparece concluída e o Lab 5 fica liberado. Os Labs 1 a 4 aparecem na trilha como
 "encontro anterior", só para consulta: a entrega deles foi feita no repositório do Encontro 1.
@@ -113,6 +122,9 @@ docker compose exec toolbox bash /work/scripts/lab7-saml-fallback.sh
 
 Roteiro: [`tutorial/lab7/index.html`](tutorial/lab7/index.html)
 
+Antes do Lab 6, apague o OTP da Ana (passo 19 do Lab 5): os comandos de terminal dos Labs 6 e 7
+entram só com a senha, e com o segundo fator cadastrado o Keycloak os recusa.
+
 O Lab 7 tem um caminho opcional, com o SimpleSAMLphp no papel de IdP SAML externo. A imagem dele só
 existe para amd64: em Mac com Apple Silicon, fique no caminho padrão acima.
 
@@ -120,6 +132,11 @@ existe para amd64: em Mac com Apple Silicon, fique no caminho padrão acima.
 docker compose --profile lab7 up -d --wait
 docker compose exec toolbox bash /work/scripts/lab7-saml.sh
 ```
+
+Na tela de login do realm `acme` aparece então o botão "Parceiro (SAML)", que leva ao SimpleSAMLphp
+(usuário `user1`, senha `user1pass`). Atenção: o `lab7-saml.sh` grava a evidência do Lab 7 no mesmo
+arquivo do caminho padrão. Se ele falhar ou parar no meio, o arquivo passa a dizer falha: rode de
+novo o `lab7-saml-fallback.sh` antes de baixar a evidência.
 
 O roteiro é o guia de bancada. A teoria que explica cada passo está na apostila do encontro, no
 Moodle.
@@ -186,6 +203,7 @@ tudo o que está errado nelas.
 |---|---|---|
 | Pessoas da ACME (diretório e realm `acme`) | `ana.souza`, `bruno.lima` (grupo `ti`), `carla.dias` (grupo `professores`) | `Senha@123` |
 | Parceiro e universidade (Lab 7) | `parceiro.user`, `maria.prof` | `Senha@123` |
+| SimpleSAMLphp (Lab 7, opcional) | `user1`, `user2` | `user1pass`, `user2pass` |
 | LDAP (administrador) | `cn=admin,dc=acme,dc=edu,dc=br` | `admin` |
 | LDAP (configuração do servidor) | `cn=admin,cn=config` | `config` |
 | LDAP Account Manager | `cn=admin` | `admin` |

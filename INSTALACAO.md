@@ -244,9 +244,9 @@ mantida. Se algum tutorial da internet mandar usar o hífen, é tutorial velho.
 ## Baixando o curso e subindo a stack
 
 Quem fez o Encontro 1 já tem o Docker instalado e pode pular todo o resto deste guia. Para
-baixar este encontro e subir a stack, siga o **README** do repositório `gia-labs-encontro2`, na seção
-"Começando o Encontro 2": ela diz como parar a stack do Encontro 1 sem apagar nada, como
-clonar este repositório e como rodar a preparação.
+baixar este encontro e subir a stack, siga o **README** do repositório `gia-labs-encontro2`, nas seções
+"Vindo do Encontro 1" e "Começando o Encontro 2": elas dizem como parar a stack do Encontro 1
+sem apagar nada, como clonar este repositório e como rodar a preparação.
 
 ---
 
