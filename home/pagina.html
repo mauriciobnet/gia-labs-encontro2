@@ -438,12 +438,22 @@ function montarProximo(servicos, c, labs){
     texto = "Todas as etapas estão verdes. Confira se as evidências foram entregues no Moodle e derrube a stack com down -v ao terminar.";
   } else if (pendente.estado === "problema") {
     rotulo = "revisar";
-    texto = pendente.rotulo + ": " + pendente.falhas + " verificação(ões) falharam. Rode de novo e leia as linhas em vermelho: "
-          + pendente.comando;
+    // Nos labs com conferência, quem falha quase sempre é ela: as linhas em vermelho dizem que
+    // passo refazer. Uma montagem que falhou também aparece aqui, e o comando dela vai junto.
+    texto = pendente.rotulo + ": " + pendente.falhas + " verificação(ões) falharam. "
+          + (pendente.conferir
+             ? "Leia as linhas em vermelho, refaça o passo indicado e rode de novo o comando que falhou: a montagem ("
+               + pendente.comando + ") ou a conferência (" + pendente.conferir + ")."
+             : "Rode de novo e leia as linhas em vermelho: " + pendente.comando);
   } else if (pendente.perfil && servicos.some(s => s.perfil === pendente.perfil && s.estado === "parado")) {
     rotulo = "próximo passo";
     texto = pendente.rotulo + " (" + pendente.titulo + ") precisa do perfil " + pendente.perfil
           + ": docker compose --profile " + pendente.perfil + " up -d";
+  } else if (pendente.conferir) {
+    rotulo = "próximo passo";
+    texto = pendente.rotulo + ": " + pendente.titulo + ". Na pasta do repositório, antes do passo 1, rode a montagem: "
+          + pendente.comando + ". Depois siga o tutorial da etapa; ele termina na conferência, que grava a evidência: "
+          + pendente.conferir;
   } else {
     rotulo = "próximo passo";
     texto = pendente.rotulo + ": " + pendente.titulo + ". "

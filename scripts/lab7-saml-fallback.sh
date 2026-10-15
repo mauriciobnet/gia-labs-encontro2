@@ -19,7 +19,10 @@
 #      do SimpleSAMLphp. É o mesmo bloco do lab7-saml.sh.
 #
 # Idempotente: pode rodar quantas vezes quiser.
-# Pré-requisitos: lab5-federacao.sh e lab6-sso.sh (realm acme + client grafana).
+# Pré-requisitos: Labs 5 e 6 (realm acme + client grafana).
+# É a montagem do Lab 7 (roda ANTES do passo 1). A evidência do lab não sai daqui: sai da
+# conferência do fim do roteiro (lab7-conferir.sh), que confere os logins feitos no navegador.
+# Na pasta do repositório:  docker compose exec -T toolbox bash /work/scripts/lab7-saml-fallback.sh
 set -euo pipefail
 source /work/scripts/lib.sh
 # O lib.sh já sabe a porta publicada; nada aqui pode ter URL com porta fixa, senão
@@ -269,10 +272,16 @@ echo
 echo "Login pelo navegador: $GRAFANA/login -> 'Sign in with Keycloak ACME'"
 echo "                      -> botão 'Parceiro (SAML via Keycloak)' -> parceiro.user / Senha@123"
 echo "                      -> botão 'Universidade (OIDC)'          -> maria.prof / Senha@123"
+# A montagem não grava a evidência do lab (mudança de 15/10/2026): guarda o que verificou para a
+# conferência do fim do roteiro, que soma isto aos logins do parceiro.user e da maria.prof no
+# navegador. Se algo falhou, grava, como antes, para o painel mostrar onde parou.
 if [ "$FAILS" -eq 0 ]; then
-  carimbar 7 "Lab 7: federação SAML (caminho padrão, IdP no Keycloak)" "realm parceiro como IdP SAML e realm universidade como IdP OIDC" ok
-  echo "LAB7 OK (caminho padrão)"
+  montagem_pronta 7
+  echo
+  echo "LAB7 PRONTO (caminho padrão): o cenário está montado. Siga o roteiro a partir do passo 1."
+  echo "A evidência do Lab 7 sai da conferência, no fim do roteiro:"
+  echo "  docker compose exec -T toolbox bash /work/scripts/lab7-conferir.sh"
 else
-  carimbar 7 "Lab 7: federação SAML (caminho padrão, IdP no Keycloak)" "$FAILS verificação(ões) falharam" falha
+  carimbar 7 "Lab 7: montagem (caminho padrão)" "$FAILS verificação(ões) falharam" falha
   echo "LAB7 (caminho padrão) FALHOU ($FAILS)"; exit 1
 fi

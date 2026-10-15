@@ -118,17 +118,23 @@ LABS = [
          tutorial="lab3", comando="docker compose exec toolbox bash /work/scripts/lab3-diretorio.sh"),
     dict(id="4", rotulo="Lab 4", titulo="O diretório para de falar em voz alta", depende="3", perfil="lab3",
          tutorial="lab4", comando="docker compose exec toolbox bash /work/scripts/lab4-ldap-tls.sh"),
+    # Labs 5 a 7 (desde 15/10/2026): "comando" é a montagem, que roda ANTES do passo 1 e não grava
+    # evidência; "conferir" é a conferência do fim do roteiro, que grava. Antes, a montagem gravava,
+    # e o painel dava o lab por concluído antes de o aluno fazer qualquer coisa.
     dict(id="p", rotulo="Preparação", titulo="Ponto de partida do Encontro 2", depende=None, perfil=None,
          tutorial="", entrega=False,
-         comando="docker compose exec toolbox bash /work/scripts/preparar-encontro2.sh && docker compose restart keycloak grafana"),
+         comando="docker compose exec -T toolbox bash /work/scripts/preparar-encontro2.sh && docker compose restart keycloak grafana"),
     dict(id="5", rotulo="Lab 5", titulo="Federar o diretório no Keycloak", depende="p", perfil=None,
-         tutorial="lab5", comando="docker compose exec toolbox bash /work/scripts/lab5-federacao.sh"),
+         tutorial="lab5", comando="docker compose exec -T toolbox bash /work/scripts/lab5-federacao.sh",
+         conferir="docker compose exec -T toolbox bash /work/scripts/lab5-conferir.sh"),
     dict(id="6", rotulo="Lab 6", titulo="SSO com OIDC", depende="5", perfil="lab6",
-         tutorial="lab6", comando="docker compose exec toolbox bash /work/scripts/lab6-sso.sh"),
+         tutorial="lab6", comando="docker compose exec -T toolbox bash /work/scripts/lab6-sso.sh",
+         conferir="docker compose exec -T toolbox bash /work/scripts/lab6-conferir.sh"),
     dict(id="7", rotulo="Lab 7", titulo="Federação SAML e brokering", depende="6", perfil=None,
          # O caminho padrão é o realm parceiro do próprio Keycloak, que roda em qualquer
          # arquitetura e não pede perfil. O SimpleSAMLphp (perfil lab7, lab7-saml.sh) é opcional.
-         tutorial="lab7", comando="docker compose exec toolbox bash /work/scripts/lab7-saml-fallback.sh"),
+         tutorial="lab7", comando="docker compose exec -T toolbox bash /work/scripts/lab7-saml-fallback.sh",
+         conferir="docker compose exec -T toolbox bash /work/scripts/lab7-conferir.sh"),
 ]
 
 # A página recebe os blocos daqui, e não de uma cópia própria: assim o empacotar.py recorta
@@ -306,6 +312,8 @@ def _labs():
             concluidos.add(lab["id"])
 
         item = {k: lab[k] for k in ("id", "rotulo", "titulo", "depende", "perfil", "tutorial", "comando")}
+        if lab.get("conferir"):
+            item["conferir"] = lab["conferir"]
         item.update(estado=estado, entrega=lab.get("entrega", True),
                     resumo=(d or {}).get("resumo", ""),
                     quando=(d or {}).get("quando", ""),

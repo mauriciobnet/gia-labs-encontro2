@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Validação automática do Lab 5: cria realm "acme", federa o OpenLDAP no Keycloak,
-# sincroniza usuários e testa login de um usuário do LDAP via token OIDC.
+# Montagem do Lab 5 (roda ANTES do passo 1): cria o realm "acme", federa o OpenLDAP no Keycloak,
+# sincroniza usuários e testa login de um usuário do LDAP via token OIDC. A evidência do lab não
+# sai daqui: sai da conferência do passo 19 (lab5-conferir.sh).
 # A federação fala com o diretório por StartTLS e confere o certificado dele com a CA da
 # ACME, a mesma que o Lab 4 emitiu (no Encontro 2, a preparação do encontro a recria).
 # Também registra o Grafana como client OIDC: é por ele que a Ana cadastra o segundo fator.
-# Roda DENTRO do toolbox:  docker compose exec toolbox bash /work/scripts/lab5-federacao.sh
+# Na pasta do repositório:  docker compose exec -T toolbox bash /work/scripts/lab5-federacao.sh
 set -euo pipefail
 PORTA=${GIA_PORT:-18080}
 KC=http://keycloak.localhost:$PORTA
@@ -230,11 +231,15 @@ GRUPOS_ANA=$(curl -fsS "${auth[@]}" "$KC/admin/realms/$REALM/users/$UID_/groups"
 echo "$GRUPOS_ANA"
 
 # ---------------------------------------------------------------------------
-# Evidência do lab: o arquivo que o aluno entrega no Moodle e que o painel lê.
-# Como este script roda com 'set -e', chegar aqui já significa que tudo deu certo;
-# o que interessa registrar é o que foi OBSERVADO, não que passou.
-EV_ITENS="/tmp/gia-itens-$$.tsv"; : > "$EV_ITENS"
-ev_item() { printf '%s\t%s\t%s\n' "$1" "$(printf '%s' "$2" | tr '\t\n' '  ')" "$(printf '%s' "${3:-}" | tr '\t\n' '  ')" >> "$EV_ITENS"; }
+# O que a montagem verificou. Ela NÃO grava a evidência do lab (mudança de 15/10/2026): quem grava
+# é a conferência do passo 19 (lab5-conferir.sh), que soma estas linhas ao que o aluno fez no
+# console, a defesa contra força bruta, a política de senha, o bloqueio e o segundo fator. Antes,
+# este script gravava a evidência aqui, e o painel dava o Lab 5 por concluído antes de o aluno
+# começar. Como ele roda com 'set -e', chegar aqui já significa que tudo deu certo; o que
+# interessa registrar é o que foi OBSERVADO.
+OUT=/work/out; mkdir -p "$OUT"
+MONTAGEM="$OUT/lab5-montagem.tsv"; : > "$MONTAGEM"
+ev_item() { printf '%s\t%s\t%s\n' "$1" "$(printf '%s' "$2" | tr '\t\n' '  ')" "$(printf '%s' "${3:-}" | tr '\t\n' '  ')" >> "$MONTAGEM"; }
 
 ev_item ok "realm federado" "$REALM"
 ev_item ok "conexão com o diretório" "$LDAP_URL com StartTLS, certificado conferido pela CA da ACME"
@@ -245,6 +250,16 @@ ev_item ok "grupos de ana.souza no Keycloak" "$(echo "$GRUPOS_ANA" | paste -sd',
 GRAFANA_CLIENT=$(curl -fsS "${auth[@]}" "$KC/admin/realms/$REALM/clients?clientId=grafana" | jq -r '.[0] | "\(.clientId) confidencial=\(.publicClient | not) redirect=\(.redirectUris | join(","))"')
 ev_item ok "aplicação registrada no realm" "$GRAFANA_CLIENT"
 
-python3 /work/scripts/evidencia.py gravar --lab 5 \
-  --titulo "Lab 5: federação do diretório no Keycloak" --itens "$EV_ITENS" || true
-echo "LAB5 OK"
+# Evidência que não veio da conferência (a das versões antigas deste script) diria ao painel que o
+# Lab 5 terminou: sai. A da conferência fica, para quem roda a montagem de novo depois do lab.
+EV="$OUT/evidencia-lab5.json"
+if [ -f "$EV" ] && ! jq -e '(.titulo // "") | test("conferência")' "$EV" >/dev/null 2>&1; then
+  rm -f "$EV"
+  echo "(a evidência antiga do Lab 5 foi apagada: a nova sai da conferência do passo 19)"
+fi
+
+echo
+echo "LAB5 PRONTO: o cenário está montado. Siga o roteiro a partir do passo 1."
+echo "A evidência do Lab 5 não sai daqui: ela nasce no passo 19, na conferência, depois do que"
+echo "você fizer no console:"
+echo "  docker compose exec -T toolbox bash /work/scripts/lab5-conferir.sh"

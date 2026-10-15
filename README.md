@@ -88,64 +88,92 @@ Depois abra o **painel** em <http://localhost:18080>. Quando os serviços ficare
 Cada laboratório tem um **roteiro ilustrado** em `tutorial/`, com a captura de cada tela da execução
 de referência. Abra pelo painel ou direto no arquivo: são páginas que funcionam sozinhas, sem rede.
 
-Nos roteiros, cada comando diz onde roda. Os marcados **terminal · dentro do toolbox** rodam no
-container `toolbox`. Para entrar nele, na pasta `gia-labs-encontro2`:
+Cada laboratório começa por uma **montagem**, antes do passo 1, e termina numa **conferência**, que
+vê o que você fez no console e no navegador e grava a evidência. A montagem sozinha não conclui o
+lab: no painel, ele só fica verde depois da conferência.
 
-```bash
-docker compose exec toolbox bash
-```
-
-O prompt muda e os comandos passam a rodar lá dentro. Para voltar ao seu terminal, `exit`.
+Neste encontro, todo comando dos roteiros roda no **terminal do seu computador, na pasta `gia-labs-encontro2`**,
+e cada caixa diz isso (*terminal · na pasta gia-labs-encontro2/*). O que precisa do container `toolbox` entra
+nele sozinho, pelo `docker compose exec -T toolbox`: um script, pelo caminho dele, e um comando solto,
+entre duas linhas `TOOLBOX`. Copie a caixa inteira, pelo botão **copiar**. Se quiser explorar por
+dentro, `docker compose exec toolbox bash` abre um terminal no toolbox, e `exit` volta.
 
 ### Lab 5: Federar o diretório no Keycloak
 
+Antes do passo 1, a montagem do laboratório:
+
 ```bash
-docker compose exec toolbox bash /work/scripts/lab5-federacao.sh
+docker compose exec -T toolbox bash /work/scripts/lab5-federacao.sh
+```
+
+No fim do roteiro, a conferência, que grava a evidência:
+
+```bash
+docker compose exec -T toolbox bash /work/scripts/lab5-conferir.sh
 ```
 
 Roteiro: [`tutorial/lab5/index.html`](tutorial/lab5/index.html)
 
 ### Lab 6: SSO com OIDC
 
+Antes do passo 1, a montagem do laboratório:
+
 ```bash
 docker compose --profile lab6 up -d --wait
-docker compose exec toolbox bash /work/scripts/lab6-sso.sh
+docker compose exec -T toolbox bash /work/scripts/lab6-sso.sh
+```
+
+No fim do roteiro, a conferência, que grava a evidência:
+
+```bash
+docker compose exec -T toolbox bash /work/scripts/lab6-conferir.sh
 ```
 
 Roteiro: [`tutorial/lab6/index.html`](tutorial/lab6/index.html)
 
 ### Lab 7: Federação SAML e brokering
 
+Antes do passo 1, a montagem do laboratório:
+
 ```bash
-docker compose exec toolbox bash /work/scripts/lab7-saml-fallback.sh
+docker compose exec -T toolbox bash /work/scripts/lab7-saml-fallback.sh
+```
+
+No fim do roteiro, a conferência, que grava a evidência:
+
+```bash
+docker compose exec -T toolbox bash /work/scripts/lab7-conferir.sh
 ```
 
 Roteiro: [`tutorial/lab7/index.html`](tutorial/lab7/index.html)
 
-Antes do Lab 6, apague o OTP da Ana (passo 19 do Lab 5): os comandos de terminal dos Labs 6 e 7
-entram só com a senha, e com o segundo fator cadastrado o Keycloak os recusa.
+No Lab 5, a conferência do passo 19 apaga o OTP da Ana por último: os comandos de terminal dos Labs
+6 e 7 entram só com a senha, e com o segundo fator cadastrado o Keycloak os recusa.
 
 O Lab 7 tem um caminho opcional, com o SimpleSAMLphp no papel de IdP SAML externo. A imagem dele só
 existe para amd64: em Mac com Apple Silicon, fique no caminho padrão acima.
 
 ```bash
 docker compose --profile lab7 up -d --wait
-docker compose exec toolbox bash /work/scripts/lab7-saml.sh
+docker compose exec -T toolbox bash /work/scripts/lab7-saml.sh
 ```
 
 Na tela de login do realm `acme` aparece então o botão "Parceiro (SAML)", que leva ao SimpleSAMLphp
-(usuário `user1`, senha `user1pass`). Atenção: o `lab7-saml.sh` grava a evidência do Lab 7 no mesmo
-arquivo do caminho padrão. Se ele falhar ou parar no meio, o arquivo passa a dizer falha: rode de
-novo o `lab7-saml-fallback.sh` antes de baixar a evidência.
+(usuário `user1`, senha `user1pass`). O `lab7-saml.sh` não grava evidência: a entrega do Lab 7 é a
+da conferência do caminho padrão.
 
 O roteiro é o guia de bancada. A teoria que explica cada passo está na apostila do encontro, no
 Moodle.
 
 ## Entregando no Moodle
 
-Os Labs 5, 6 e 7 terminam gravando um arquivo `evidencia-labN.json` com o que foi verificado **na
-sua máquina**: seu nome, seu e-mail, o identificador da sua instalação, os horários e o que cada
-teste observou. Baixe pelo botão "evidência" da etapa no painel e suba na tarefa correspondente.
+Os Labs 5, 6 e 7 terminam numa conferência, que soma o que a montagem verificou ao que você fez e
+grava um arquivo `evidencia-labN.json` com o que foi verificado **na sua máquina**: seu nome, seu
+e-mail, o identificador da sua instalação, os horários e o que cada verificação observou. Baixe pelo
+botão "evidência" da etapa no painel e suba na tarefa correspondente.
+
+Se a conferência mostrar uma linha `[FALHA]`, a linha diz qual passo refazer: refaça e rode a
+conferência de novo, que o arquivo é gravado outra vez.
 
 Dois arquivos iguais se denunciam sozinhos, então não adianta pedir o do colega. E se um laboratório
 parar no meio, a evidência é gravada mesmo assim, marcada como interrompida: entregue assim e diga
@@ -175,13 +203,18 @@ na seção "Vindo do Encontro 1". Se não for isso, copie `env-exemplo.txt` para
 preparação: `docker compose restart keycloak grafana`, e rode o Lab 5 de novo (ele espera o Keycloak
 voltar).
 
-**O Lab 6 diz que a ana.souza ainda tem o OTP do Lab 5.** Faltou o penúltimo passo do Lab 5: em
-Users > ana.souza > Credentials, no console do Keycloak, apague a linha Otp e rode o Lab 6 de novo.
-Os comandos de terminal entram com a senha só, e com o segundo fator cadastrado o Keycloak os recusa.
+**O Lab 5 continua "disponível" no painel depois da montagem.** Normal: ele só fica verde na
+conferência do passo 19, depois do que você fizer no console.
 
-**`curl: could not resolve host` no seu terminal.** Normal. Os nomes `*.localhost` são resolvidos
-pelo **navegador**, não pelo resolvedor do sistema no Windows e no macOS. Por isso todo comando dos
-roteiros roda dentro do container `toolbox`.
+**O Lab 6 diz que a ana.souza ainda tem o OTP do Lab 5.** Faltou a conferência do Lab 5 (passo 19),
+que apaga o OTP por último, e só quando tudo o mais passou. Rode-a, refaça o que ela apontar e rode
+a montagem do Lab 6 de novo. Os comandos de terminal entram com a senha só, e com o segundo fator
+cadastrado o Keycloak os recusa.
+
+**`curl: could not resolve host` no seu terminal.** Os nomes `*.localhost` são resolvidos pelo
+**navegador**, e nem sempre pelo resolvedor do sistema. Por isso os comandos dos roteiros entram no
+container `toolbox`, pelo `docker compose exec -T toolbox`, e o `curl` roda lá dentro. Se você
+digitou só o `curl`, sem a primeira linha da caixa, copie a caixa inteira.
 
 **No Ubuntu do Windows: `The command 'docker' could not be found in this WSL 2 distro`, ou
 `permission denied` ao rodar o `docker`.** Os dois têm conserto no [INSTALACAO.md](INSTALACAO.md),

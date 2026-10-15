@@ -112,3 +112,41 @@ say() { printf '\n== %s ==\n' "$*"; }
 ok()  { printf '\e[32m[ OK ]\e[0m %s\n' "$*"; ev_item ok "$*"; }
 ko()  { printf '\e[31m[FALHA]\e[0m %s\n' "$*"; ev_item falha "$*"; FAILS=$((FAILS+1)); }
 FAILS=0
+
+# ---------------------------------------------------------------------------
+# Montagem e conferência (Labs 5 a 7, desde 15/10/2026).
+#
+# O script de cada lab roda ANTES do passo 1 e só monta o cenário. Antes ele gravava a evidência
+# no fim dele mesmo, e o painel dava o lab por concluído antes de o aluno fazer qualquer coisa
+# (achado do professor no Lab 5: concluído sem a defesa contra força bruta configurada). Agora a
+# montagem guarda o que verificou em $OUT/labN-montagem.tsv, e quem grava a evidência é a
+# conferência do fim do roteiro (labN-conferir.sh), que soma a montagem ao que o aluno fez.
+montagem_pronta() { # numero
+  local ev="$OUT/evidencia-lab$1.json"
+  cp -f "$EV_ITENS" "$OUT/lab$1-montagem.tsv"
+  # Evidência que não veio da conferência (a de uma montagem interrompida, ou a das versões
+  # antigas destes scripts) diria ao painel uma coisa que já não vale: sai.
+  if [ -f "$ev" ] && ! jq -e '(.titulo // "") | test("conferência")' "$ev" >/dev/null 2>&1; then
+    rm -f "$ev"
+  fi
+  EV_GRAVADA=1
+}
+
+# Na conferência, cada linha diz o que foi visto e, se falhou, qual passo refazer.
+conf_ok()    { printf '\e[32m[ OK ]\e[0m %s\n' "$1"; [ -z "${2:-}" ] || printf '       %s\n' "$2"; ev_item ok "$1" "${2:-}"; }
+conf_falha() { printf '\e[31m[FALHA]\e[0m %s\n' "$1"; [ -z "${2:-}" ] || printf '       visto: %s\n' "$2"; ev_item falha "$1" "${2:-}"; FAILS=$((FAILS+1)); }
+conf_montagem() { # numero comando-da-montagem
+  local f="$OUT/lab$1-montagem.tsv" e q o
+  if [ ! -s "$f" ]; then
+    conf_falha "a montagem do Lab $1 não foi registrada: rode-a antes do passo 1" "$2"
+    return 0
+  fi
+  while IFS=$'\t' read -r e q o; do
+    [ -n "$q" ] || continue
+    if [ "$e" = ok ]; then conf_ok "montagem: $q" "$o"; else conf_falha "montagem: $q" "$o"; fi
+  done < "$f"
+}
+conf_gravar() { # numero
+  python3 /work/scripts/evidencia.py gravar --lab "$1" --titulo "Lab $1: conferência do laboratório" --itens "$EV_ITENS" || true
+  EV_GRAVADA=1
+}

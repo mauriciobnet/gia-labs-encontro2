@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-# Lab 6 · SSO com OIDC: registra o oauth2-proxy (app.localhost) como client do realm acme, cria o
-# client scope "groups" (claim com os grupos do LDAP) e o liga aos clients que já existiam (o
-# grafana e o toolbox-cli nascem no Lab 5).
-# Pré-requisito: lab5-federacao.sh executado (realm acme, federação LDAP, clients do Lab 5).
+# Montagem do Lab 6 · SSO com OIDC (roda ANTES do passo 1): registra o oauth2-proxy (app.localhost)
+# como client do realm acme, cria o client scope "groups" (claim com os grupos do LDAP), o liga aos
+# clients que já existiam (o grafana e o toolbox-cli nascem no Lab 5) e liga o registro dos eventos
+# de login e logout do realm. A evidência do lab não sai daqui: sai da conferência do fim do
+# roteiro (lab6-conferir.sh), que lê desses eventos o que o aluno fez no navegador.
+# Pré-requisito: Lab 5 concluído (a conferência do passo 19 apaga o OTP da Ana).
+# Na pasta do repositório:  docker compose exec -T toolbox bash /work/scripts/lab6-sso.sh
 set -euo pipefail
 source /work/scripts/lib.sh
 
@@ -78,12 +81,26 @@ else
   ko "o realm $REALM não publicou o documento de descoberta; rode o Lab 5 antes"
 fi
 
+say "eventos de login e logout do realm (é deles que a conferência do fim do lab lê)"
+# O Keycloak vem com o registro de eventos de usuário desligado (seção 4.8 da apostila). Sem ele,
+# nada sobra no servidor do que o aluno fez no navegador: o logout do passo 9 encerra a sessão, e
+# a conferência não teria como saber que houve SSO. Com ele, cada login (por aplicação) e cada
+# logout viram uma linha em Realm settings > Events.
+CFG=$(kc_get "/events/config")
+kc_put "/events/config" "$(jq -c '.eventsEnabled = true
+  | .enabledEventTypes = (((.enabledEventTypes // []) + ["LOGIN", "LOGIN_ERROR", "LOGOUT", "CODE_TO_TOKEN"]) | unique)' <<< "$CFG")" >/dev/null
+if kc_get "/events/config" | jq -e '.eventsEnabled == true and (.enabledEventTypes | index("LOGIN")) != null and (.enabledEventTypes | index("LOGOUT")) != null' >/dev/null; then
+  ok "eventos LOGIN e LOGOUT do realm $REALM sendo registrados (Realm settings > Events)"
+else
+  ko "o Keycloak não ligou o registro de eventos do realm $REALM"
+fi
+
 say "a Ana ainda tem o segundo fator do Lab 5?"
 # O teste de token abaixo é um password grant, que não foi feito para segundo fator. Com o OTP
 # do Lab 5 ainda cadastrado, o Keycloak recusa o token, e a falha pareceria ser deste lab.
 ID_ANA=$(kc_get "/users?username=ana.souza&exact=true" | jq -r '.[0].id // empty')
 if [ -n "$ID_ANA" ] && kc_get "/users/$ID_ANA/credentials" | jq -e '.[] | select(.type=="otp")' >/dev/null; then
-  ko "a ana.souza ainda tem o OTP do Lab 5. Apague em Users > ana.souza > Credentials (é o penúltimo passo do Lab 5) e rode este script de novo"
+  ko "a ana.souza ainda tem o OTP do Lab 5. Rode a conferência do Lab 5 (passo 19), que o apaga, ou apague a linha Otp em Users > ana.souza > Credentials, e rode este script de novo"
 else
   echo "não: o terminal pode pedir token só com a senha"
 fi
@@ -125,5 +142,13 @@ else
   ko "userinfo não respondeu para o token de ana"
 fi
 
-if [ "$FAILS" -eq 0 ]; then carimbar 6 "Lab 6: SSO com OIDC" "claim groups nos clients e app-acme atrás do oauth2-proxy" ok; echo "LAB6 OK"
-else carimbar 6 "Lab 6: SSO com OIDC" "$FAILS verificação(ões) falharam" falha; echo "LAB6 FALHOU ($FAILS)"; exit 1; fi
+# A montagem não grava a evidência do lab (mudança de 15/10/2026): guarda o que verificou para a
+# conferência do fim do roteiro, que soma isto ao que o aluno fez no navegador. Se algo falhou,
+# grava, como antes, para o painel mostrar onde parou.
+if [ "$FAILS" -eq 0 ]; then
+  montagem_pronta 6
+  echo
+  echo "LAB6 PRONTO: o cenário está montado. Siga o roteiro a partir do passo 1."
+  echo "A evidência do Lab 6 sai da conferência, no fim do roteiro:"
+  echo "  docker compose exec -T toolbox bash /work/scripts/lab6-conferir.sh"
+else carimbar 6 "Lab 6: montagem" "$FAILS verificação(ões) falharam" falha; echo "LAB6 FALHOU ($FAILS)"; exit 1; fi

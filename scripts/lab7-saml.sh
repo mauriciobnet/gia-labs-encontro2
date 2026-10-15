@@ -2,8 +2,12 @@
 # Lab 7 · Federação: Keycloak (realm acme) como SP/broker de um IdP SAML externo (SimpleSAMLphp = "parceiro")
 # + desafio: brokering OIDC com um 2º realm ("universidade") no mesmo Keycloak.
 # Pré-requisitos: lab5-federacao.sh e lab6-sso.sh; serviço 'idp' no ar (--profile lab7).
+# Caminho OPCIONAL: não grava evidência (desde 15/10/2026). A entrega do Lab 7 é a do caminho
+# padrão, gravada pela conferência do fim do roteiro (lab7-conferir.sh). Antes, este script
+# gravava no mesmo arquivo e podia trocar uma evidência boa por uma falha.
 set -euo pipefail
 source /work/scripts/lib.sh
+LAB_NUM=""   # nem quando para no meio
 IDP_URL=$(u idp)
 IDP_META="$IDP_URL/simplesaml/saml2/idp/metadata.php"
 
@@ -194,5 +198,6 @@ else
 fi
 if printf '%s' "$CADEIA_U" | grep -q 'code_challenge_method=S256'; then ok "broker OIDC usa PKCE"; else ko "broker OIDC sem PKCE na cadeia"; fi
 
-if [ "$FAILS" -eq 0 ]; then carimbar 7 "Lab 7: federação SAML e brokering OIDC" "IdPs parceiro-saml e universidade" ok; echo "LAB7 OK"
-else carimbar 7 "Lab 7: federação SAML e brokering OIDC" "$FAILS verificação(ões) falharam" falha; echo "LAB7 FALHOU ($FAILS)"; exit 1; fi
+EV_GRAVADA=1
+if [ "$FAILS" -eq 0 ]; then echo "SIMPLESAMLPHP OK (caminho opcional; a evidência do Lab 7 continua sendo a da conferência)"
+else echo "SIMPLESAMLPHP FALHOU ($FAILS) (caminho opcional; a evidência do Lab 7 não muda)"; exit 1; fi
