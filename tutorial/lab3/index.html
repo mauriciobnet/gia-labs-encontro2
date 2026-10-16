@@ -12,7 +12,7 @@
   h2{font-size:18px;margin:0;flex:1}
   .tag{font-size:11px;padding:3px 8px;border-radius:999px;background:#eef1f5;color:var(--muted)}.tag.term{background:#e8f0fe}.tag.ui{background:#e6f4ea}
   .status{font-size:12px;color:var(--ok)}.falha .status{color:var(--bad)}
-  .texto{margin:12px 0 6px;line-height:1.55}.url{font-size:13px;color:var(--muted)}code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .texto{margin:12px 0 6px;line-height:1.55}.url{font-size:13px;color:var(--muted);overflow-wrap:anywhere}code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
   figure{margin:14px 0 6px}img{max-width:100%;border:1px solid var(--line);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
   figcaption{font-size:12px;color:var(--muted);margin-top:6px}
   .esperado{background:#f0f7f2;border-left:4px solid var(--ok);padding:8px 12px;border-radius:6px;font-size:14px}
@@ -30,6 +30,12 @@
     img{max-height:235mm}
     .esperado{break-before:avoid;page-break-before:avoid}
   }
+  .feito{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 8px;white-space:nowrap;user-select:none}
+  .feito input{margin:0;width:15px;height:15px;accent-color:var(--ok);cursor:pointer}
+  .feito.on{color:var(--ok);border-color:var(--ok);background:#f0f7f2}
+  .passo.marcado{border-color:#b7dcc2}
+  .progresso{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.progresso button{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+  @media print{.feito,.progresso button{display:none}}
   </style><!-- copiaveis -->
 <style>/* copiaveis */
 .cmdbox{border:1px solid #dcd8cb;border-radius:10px;overflow:hidden;margin:12px 0;background:#faf8f2}
@@ -47,10 +53,12 @@
 </head><body>
   <div class="capa"><div class="kicker">GIA: Gerenciamento de Identidade e Acesso · CESC/UTFPR · tutorial gerado por execução real</div>
   <h1>Lab 3: o diretório visto pelas aplicações</h1><p>Ligar o GLPI ao OpenLDAP da ACME, ver a mesma pessoa entrar em duas aplicações diferentes e descobrir quem decide o que ela pode fazer</p>
-  <p>21 passos · 21 conferidos à mão · capturas de uma execução real na stack do laboratório, GLPI 10.0.26 e Grafana 11.6.0</p></div>
+  <p>21 passos · telas capturadas na configuração real</p>
+  <p class="progresso"><span id="prog"></span><button type="button" id="prog-limpar" hidden>desmarcar todos</button></p>
+  <p>Marque “feito” em cada passo quando terminar: a marca fica guardada só neste navegador.</p></div>
   <main>
   <section class="passo manual">
-    <header><span class="num">1</span><h2>Subir o bloco do Lab 3</h2><span class="tag term">terminal</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">1</span><h2>Subir o bloco do Lab 3</h2><span class="tag term">terminal</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="1"> feito</label></header>
     <p class="texto">O perfil lab3 acrescenta MariaDB, GLPI e Grafana à stack. O GLPI se instala sozinho na primeira subida e só responde depois disso, o que leva cerca de um minuto.</p>
     
     <div class="cmdbox" data-onde="host"><div class="cmdcab"><span>terminal · na pasta gia-labs/</span><button type="button">copiar</button></div><pre>docker compose --profile lab3 up -d</pre></div>
@@ -60,7 +68,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">2</span><h2>A lista de diretórios começa vazia</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">2</span><h2>A lista de diretórios começa vazia</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="2"> feito</label></header>
     <p class="texto">Entre no GLPI como glpi e vá em Configuração, Autenticação (authentication), Diretórios (directories) LDAP. O GLPI sobe em inglês, e este roteiro usa os nomes em português: para trocar, abra o menu do seu usuário no canto superior direito, abra a lista do idioma atual (English) e escolha Português do Brasil. Não existe diretório nenhum: o GLPI recém instalado só conhece as contas (accounts) locais dele.</p>
     <p class="url">URL: <code>http://glpi.localhost:18080/front/authldap.php</code></p>
     
@@ -70,7 +78,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">3</span><h2>O formulário em branco</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">3</span><h2>O formulário em branco</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="3"> feito</label></header>
     <p class="texto">Clique em + Adicionar. São doze campos, e é por isso que existe a linha Pré-configuração no topo: ninguém decora filtro de conexão nem nome de atributo (attribute) de sincronização.</p>
     
     
@@ -80,7 +88,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">4</span><h2>A pré-configuração OpenLDAP preenche três campos</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">4</span><h2>A pré-configuração OpenLDAP preenche três campos</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="4"> feito</label></header>
     <p class="texto">Clique no link OpenLDAP. Ele escreve sozinho o Filtro da conexão (objectClass=inetOrgPerson), o Campo de Login uid e o Campo de sincronização entryuuid. Esses três valores são a diferença entre um diretório OpenLDAP e um Active Directory, onde seriam objectClass=user, samaccountname e objectguid.</p>
     
     
@@ -90,7 +98,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">5</span><h2>Preencher o que só você sabe</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">5</span><h2>Preencher o que só você sabe</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="5"> feito</label></header>
     <p class="texto">Nome ACME, Servidor openldap, Porta 389, BaseDN dc=acme,dc=edu,dc=br, RootDN cn=admin,dc=acme,dc=edu,dc=br e a senha (password) admin. Servidor padrão e Ativo vêm em Não e precisam ir para Sim: um diretório inativo é ignorado na autenticação e o GLPI não avisa, ele só recusa o login depois como se a senha estivesse errada.</p>
     
     
@@ -100,7 +108,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">6</span><h2>O diretório aparece na lista</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">6</span><h2>O diretório aparece na lista</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="6"> feito</label></header>
     <p class="texto">Depois de + Adicionar, a lista que estava vazia no passo 2 mostra uma linha. Repare na coluna Ativo.</p>
     
     
@@ -110,7 +118,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">7</span><h2>Testar a conexão</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">7</span><h2>Testar a conexão</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="7"> feito</label></header>
     <p class="texto">Abra o diretório ACME e vá na aba Testar. Este teste usa o RootDN e a senha de serviço, ou seja, prova que o GLPI consegue se conectar e procurar. Ele não prova que alguém consegue entrar, e passa mesmo com o diretório inativo.</p>
     
     
@@ -120,7 +128,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">8</span><h2>A tela de importação</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">8</span><h2>A tela de importação</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="8"> feito</label></header>
     <p class="texto">Administração, Usuários, botão Link do diretório LDAP, opção Importar novos usuários. A tela oferece filtros por usuário, e-mail, nome, telefone e mais. Deixe tudo em branco.</p>
     <p class="url">URL: <code>http://glpi.localhost:18080/front/ldap.import.php</code></p>
     
@@ -130,7 +138,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">9</span><h2>Quem o filtro alcança</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">9</span><h2>Quem o filtro alcança</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="9"> feito</label></header>
     <p class="texto">Clique em Pesquisar. O GLPI lista todas as entradas que casam com (objectClass=inetOrgPerson) dentro da BaseDN. A coluna Campo de sincronização mostra o entryUUID de cada pessoa, gerado pelo diretório. É por ele que o GLPI vai reconhecer essas contas no futuro, e não pelo DN, que muda quando alguém troca de unidade.</p>
     
     
@@ -140,7 +148,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">10</span><h2>Importar</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">10</span><h2>Importar</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="10"> feito</label></header>
     <p class="texto">Marque a caixa do cabeçalho, clique em Ações, escolha Importar e clique em Enviar.</p>
     
     
@@ -150,7 +158,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">11</span><h2>As pessoas do diretório agora existem no GLPI</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">11</span><h2>As pessoas do diretório agora existem no GLPI</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="11"> feito</label></header>
     <p class="texto">A lista de usuários mistura as contas locais do GLPI (glpi, tech, normal, post-only) com as que vieram do diretório, já com o e-mail que estava lá no atributo mail.</p>
     
     
@@ -160,7 +168,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">12</span><h2>O que o GLPI guardou de cada pessoa</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">12</span><h2>O que o GLPI guardou de cada pessoa</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="12"> feito</label></header>
     <p class="texto">Na ficha da ana.souza, o bloco Autenticação mostra de qual diretório ela veio, quando foi a última sincronização e o DN completo dela. O nome, o sobrenome e o e-mail vieram do diretório. A senha não está aqui, nem em lugar nenhum do GLPI.</p>
     
     
@@ -170,7 +178,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">13</span><h2>Autenticação não é autorização</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">13</span><h2>Autenticação não é autorização</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="13"> feito</label></header>
     <p class="texto">A aba Autorizações mostra Root entity com o perfil Self-Service, marcado com (D) de dinâmico. Quem decidiu isso foi o GLPI, na falta de regra em contrário. O diretório disse quem a pessoa é; o que ela pode fazer é decisão de cada aplicação. Em Administração, Regras existe o conjunto que permite dizer, por exemplo, que quem está em cn=ti vira Super-Admin.</p>
     
     
@@ -180,7 +188,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">14</span><h2>A segunda aplicação, sem configurar nada</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">14</span><h2>A segunda aplicação, sem configurar nada</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="14"> feito</label></header>
     <p class="texto">O Grafana já subiu ligado ao mesmo diretório pelo arquivo grafana/ldap.toml, que faz na configuração exatamente o que você fez na mão nas telas do GLPI. Repare na tela de login: além do formulário de usuário e senha, há um botão do Keycloak, que não funciona neste encontro: entre pelo formulário. A mesma pessoa, a mesma senha, duas aplicações que nunca souberam uma da outra.</p>
     <p class="url">URL: <code>http://grafana.localhost:18080</code></p>
     
@@ -190,7 +198,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">15</span><h2>Do grupo ao papel: onde o Grafana guarda a regra</h2><span class="tag term">terminal</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">15</span><h2>Do grupo ao papel: onde o Grafana guarda a regra</h2><span class="tag term">terminal</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="15"> feito</label></header>
     <p class="texto">Até aqui o diretório só conferiu a senha. Daqui até o fim do laboratório, a meta é uma só: quem está no grupo ti do diretório deve virar administrador nas duas aplicações. No Grafana isso já está escrito no arquivo grafana/ldap.toml. Veja as três regras dele, no toolbox:</p>
     
     <div class="cmdbox" data-onde="toolbox"><div class="cmdcab"><span>terminal · dentro do toolbox</span><button type="button">copiar</button></div><pre>grep -B1 org_role /work/grafana/ldap.toml</pre></div>
@@ -200,7 +208,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">16</span><h2>Testar a regra do Grafana com a Ana e com a Carla</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">16</span><h2>Testar a regra do Grafana com a Ana e com a Carla</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="16"> feito</label></header>
     <p class="texto">Entre no Grafana como admin (senha admin) e vá em Administration, Authentication, LDAP. Essa tela testa uma pessoa pelo nome de usuário, sem pedir a senha dela. Digite ana.souza e clique em Run. Depois faça o mesmo com carla.dias.</p>
     <p class="url">URL: <code>http://grafana.localhost:18080/admin/authentication/ldap</code></p>
     
@@ -210,7 +218,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">17</span><h2>Ensinar o GLPI a achar os grupos</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">17</span><h2>Ensinar o GLPI a achar os grupos</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="17"> feito</label></header>
     <p class="texto">O GLPI ainda não sabe onde estão os grupos. Volte ao diretório ACME (Configuração, Autenticação, Diretórios LDAP) e abra a aba Grupos. Três campos já vêm certos: Tipos de pesquisa em Em grupos, o atributo member e Usar DN na pesquisa em Sim. O quarto vem errado: o atalho OpenLDAP deixou em Filtrar para pesquisar em grupos o filtro de pessoas, (objectClass=inetOrgPerson). Troque por (objectClass=groupOfNames) e salve.</p>
     
     
@@ -220,7 +228,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">18</span><h2>Importar os grupos ti e professores</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">18</span><h2>Importar os grupos ti e professores</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="18"> feito</label></header>
     <p class="texto">Administração, Grupos, botão Link do diretório LDAP, opção Importação dos novos grupos. Marque os dois grupos e importe pelo menu Ações.</p>
     <p class="url">URL: <code>http://glpi.localhost:18080/front/ldap.group.import.php</code></p>
     
@@ -230,7 +238,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">19</span><h2>A regra do GLPI: quem está em ti vira Super-Admin</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">19</span><h2>A regra do GLPI: quem está em ti vira Super-Admin</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="19"> feito</label></header>
     <p class="texto">Administração, Regras, Regras para associar permissões (permissions) a um usuário, + Adicionar. Nome TI vira Super-Admin, Ativo Sim, e salve. Na aba Critérios, adicione Grupo é ti. Na aba Ações, adicione Perfis, Atribuir, Super-Admin. Por fim, na aba Regra, clique em Testar, escolha o grupo ti e execute.</p>
     
     
@@ -240,7 +248,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">20</span><h2>Sincronizar e conferir: a Ana virou administradora</h2><span class="tag ui">navegador</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">20</span><h2>Sincronizar e conferir: a Ana virou administradora</h2><span class="tag ui">navegador</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="20"> feito</label></header>
     <p class="texto">Para aplicar a regra a quem já existe, use Administração, Usuários, botão Link do diretório LDAP, opção Sincronização de usuários já importados, e sincronize todos. Abra a aba Autorizações da ana.souza e compare com o passo 13. Faça o mesmo com a carla.dias.</p>
     
     
@@ -250,7 +258,7 @@
   </section>
 
   <section class="passo manual">
-    <header><span class="num">21</span><h2>Gerar e conferir a evidência da etapa</h2><span class="tag term">terminal</span><span class="status">conferido à mão</span></header>
+    <header><span class="num">21</span><h2>Gerar e conferir a evidência da etapa</h2><span class="tag term">terminal</span><label class="feito" title="Marque quando terminar este passo"><input type="checkbox" data-passo="21"> feito</label></header>
     <p class="texto">Cada laboratório grava um arquivo com o que foi verificado NA SUA máquina: seu nome, seu e-mail, o identificador (identifier) da instalação, os horários e o que cada teste observou. No Lab 3, quem grava é o lab3-diretorio.sh, e ele só lê, não muda nada. Confere três lugares: o diretório (pessoas, grupos, e-mails e senhas definidas); o banco do GLPI (o diretório ACME ativo apontando para o openldap, as três pessoas importadas, o filtro de grupos do passo 17, os grupos ti e professores, a regra do passo 19 e o Super-Admin (D) da ana.souza, com a carla.dias sem Super-Admin); e o Grafana (Admin para a ana.souza e Editor para a carla.dias, o mesmo teste do passo 16).</p>
     
     <div class="cmdbox" data-onde="toolbox"><div class="cmdcab"><span>terminal · dentro do toolbox</span><button type="button">copiar</button></div><pre>bash /work/scripts/lab3-diretorio.sh
@@ -258,7 +266,22 @@ python3 /work/scripts/evidencia.py mostrar --lab 3</pre></div>
     
     <p class="esperado"><strong>Resultado esperado:</strong> A conferência termina em LAB3 OK. Se aparecer [FALHA], a própria linha diz qual passo refazer: refaça e rode o script de novo. O segundo comando mostra o arquivo de evidência, que registra, entre outras coisas, quando o SEU GLPI criou o diretório e a regra e quando importou e sincronizou a ana.souza. Baixe pelo botão "evidência" da etapa no painel (http://localhost:18080) e suba na tarefa do Moodle.</p>
     
-  </section></main>
+  </section></main><script>(function(){
+  var K="gia-tutorial-lab3", marcados={};
+  try{marcados=JSON.parse(localStorage.getItem(K)||"{}")||{};}catch(e){}
+  var caixas=[].slice.call(document.querySelectorAll('.feito input')), total=caixas.length;
+  var info=document.getElementById('prog'), limpar=document.getElementById('prog-limpar');
+  function pinta(){
+    var n=0;
+    caixas.forEach(function(c){var on=!!marcados[c.getAttribute('data-passo')];c.checked=on;c.parentNode.classList.toggle('on',on);var s=c.closest('.passo');if(s)s.classList.toggle('marcado',on);if(on)n++;});
+    if(info)info.textContent=n===0?'Nenhum passo marcado como feito ainda.':(n===total?'Você marcou os '+total+' passos como feitos.':'Você marcou '+n+' de '+total+' passos como feitos.');
+    if(limpar)limpar.hidden=n===0;
+  }
+  function grava(){try{localStorage.setItem(K,JSON.stringify(marcados));}catch(e){}}
+  caixas.forEach(function(c){c.addEventListener('change',function(){var k=c.getAttribute('data-passo');if(c.checked)marcados[k]=1;else delete marcados[k];grava();pinta();});});
+  if(limpar)limpar.addEventListener('click',function(){marcados={};grava();pinta();});
+  pinta();
+})();</script>
 <script>/* copiaveis */
 document.addEventListener("click", function (ev) {
   var b = ev.target.closest && ev.target.closest(".cmdbox button");
